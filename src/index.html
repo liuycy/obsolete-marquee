@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <marquee>This text will scroll from right to left</marquee>
+    <obsolete-markquee>This text will scroll from right to left</obsolete-markquee>
+
+    <script>
+      function ObsoleteMarqueeElement() {
+        const instance = Reflect.construct(HTMLElement, arguments, new.target);
+
+        function constructor() {
+          const shadow = this.attachShadow({ mode: 'open' });
+
+          const style = document.createElement('style');
+          style.textContent += ':host { display: inline-block; overflow: hidden;text-align: initial; white-space: nowrap; }';
+          style.textContent += ':host([direction="up"]), :host([direction="down"]) { overflow: initial; overflow-y: hidden; white-space: initial; }';
+          style.textContent += ':host > div { will-change: transform; }';
+
+          const div = document.createElement('div');
+          const slot = document.createElement('slot');
+          div.appendChild(slot);
+
+          shadow.appendChild(style);
+          shadow.appendChild(div);
+        }
+
+        constructor.call(instance);
+
+        return instance;
+      }
+
+      // 定义 ObsoleteMarqueeElement 原型
+      Object.defineProperties(ObsoleteMarqueeElement.prototype, {
+        [Symbol.toStringTag]: {
+          value: 'ObsoleteMarqueeElement',
+          writable: false,
+          enumerable: false,
+          configurable: false,
+        },
+      });
+
+      // 设置 ObsoleteMarqueeElement.prototype => HTMLElement.prototype + ObsoleteMarqueeElement.prototype
+      ObsoleteMarqueeElement.prototype = Object.create(HTMLElement.prototype, Object.getOwnPropertyDescriptors(ObsoleteMarqueeElement.prototype));
+
+      // 设置 ObsoleteMarqueeElement.__proto__ => HTMLElement
+      Object.setPrototypeOf(ObsoleteMarqueeElement, HTMLElement);
+
+      // 检查打印出来的两个对象在 结构上 是否一致
+      console.dir(HTMLMarqueeElement);
+      console.dir(ObsoleteMarqueeElement);
+
+      customElements.define('obsolete-markquee', ObsoleteMarqueeElement);
+    </script>
+  </body>
+</html>
