@@ -4,89 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <script src="./marquee.js"></script>
   </head>
   <body>
     <marquee direction="up">This text will scroll from right to left</marquee>
     <obsolete-markquee direction="up">This text will scroll from right to left</obsolete-markquee>
-
-    <script>
-      function ObsoleteMarqueeElement() {
-        // super()
-        const _this = Reflect.construct(HTMLElement, arguments, new.target);
-
-        // 构造函数
-        (function constructor() {
-          const shadow = this.attachShadow({ mode: 'open' });
-
-          const style = document.createElement('style');
-          style.textContent += ':host { display: inline-block; overflow: hidden;text-align: initial; white-space: nowrap; }';
-          style.textContent += ':host([direction="up"]), :host([direction="down"]) { overflow: initial; overflow-y: hidden; white-space: initial; }';
-          style.textContent += ':host > div { will-change: transform; }';
-
-          const div = document.createElement('div');
-          const slot = document.createElement('slot');
-          div.appendChild(slot);
-
-          shadow.appendChild(style);
-          shadow.appendChild(div);
-
-          Object.defineProperties(this, {
-            direction: {
-              value: this.getAttribute('direction') || '',
-              writable: true,
-              enumerable: true,
-            },
-          });
-        }.apply(_this, arguments));
-
-        // 监听 DOM attributes 变化
-        new MutationObserver(function (mutationList) {
-          for (const { target, attributeName, oldValue } of mutationList) {
-            _this[attributeName] = target.getAttribute(attributeName) || '';
-          }
-        }).observe(_this, {
-          attributes: true,
-          attributeOldValue: true,
-        });
-
-        return _this;
-      }
-
-      // 定义 ObsoleteMarqueeElement 原型
-      Object.defineProperties(ObsoleteMarqueeElement.prototype, {
-        [Symbol.toStringTag]: {
-          value: 'ObsoleteMarqueeElement',
-          writable: false,
-          enumerable: false,
-          configurable: false,
-        },
-        behavior: {
-          enumerable: true,
-          get: function behavior() {
-            return this.getAttribute('behavior');
-          },
-          set: function behavior() {
-            this.getAttribute('behavior', arguments[0] || '');
-          },
-        },
-        direction: {
-          enumerable: true,
-          get: function direction() {
-            return this.getAttribute('direction');
-          },
-          set: function direction() {
-            this.getAttribute('direction', arguments[0] || '');
-          },
-        },
-      });
-
-      // 设置 ObsoleteMarqueeElement.prototype => HTMLElement.prototype + ObsoleteMarqueeElement.prototype
-      ObsoleteMarqueeElement.prototype = Object.create(HTMLElement.prototype, Object.getOwnPropertyDescriptors(ObsoleteMarqueeElement.prototype));
-
-      // 设置 ObsoleteMarqueeElement.__proto__ => HTMLElement
-      Object.setPrototypeOf(ObsoleteMarqueeElement, HTMLElement);
-
-      customElements.define('obsolete-markquee', ObsoleteMarqueeElement);
-    </script>
   </body>
 </html>
